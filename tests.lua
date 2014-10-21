@@ -48,7 +48,7 @@ local tests = {
 
     test_failing_eval = function()
         sock = MockSock:new()
-        str = ":xterm!omar@aboumrad.info PRIVMSG #betterhangout := 10lklkj"
+        str = ":xterm!omar@aboumrad.info PRIVMSG #betterhangout := kjwkejrkje"
         expected = "PRIVMSG #betterhangout :xterm: Error!"
         result = protocol.handle(str, sock)
         assert(1 == #sock.sent)

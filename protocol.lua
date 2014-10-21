@@ -16,7 +16,7 @@ local map = {
     [(utils.msg("= (.+)"))] = function(match, sock)
         local nick, user, host, target, code = table.unpack(match)
         local status, res = pcall(loadstring("return " .. code))
-        local result = status and res or "Error! (" .. res .. ")"
+        local result = status and res or "Error!"
         sock:send(("PRIVMSG %s :%s: %s\n"):format(target, nick, result))
     end
 }
