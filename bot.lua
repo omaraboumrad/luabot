@@ -1,4 +1,4 @@
-require('protocol')
+protocol = require('protocol')
 
 -- Configuration
 
@@ -13,7 +13,7 @@ account = {
 server = {
     address = "irc.freenode.net",
     port = 6667,
-    channel = "#betterhangout"
+    channel = "#luabot"
 }
 
 -- Connectivity
@@ -35,6 +35,6 @@ while true do
     local s, status, partial = tcp:receive()
     local msg = s or partial
     print(msg)
-    handle(msg, tcp)
+    protocol.handle(msg, tcp)
 end
 tcp:close()

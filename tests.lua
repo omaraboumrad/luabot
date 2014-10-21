@@ -1,7 +1,7 @@
-require("protocol")
+protocol = require("protocol")
 
 -- Testing Helpers
-MockSock = {}
+local MockSock = {}
 function MockSock:new()
     local sock = {sent = {}}
     setmetatable(sock, self)
@@ -13,37 +13,46 @@ function MockSock:send(str)
     table.insert(self.sent, str)
 end
 
-function init()
-    return MockSock:new()
+local startswith = function(self, piece)
+      return string.sub(self, 1, string.len(piece)) == piece
 end
 
 -- Tests
-tests = {
+local tests = {
     test_ping = function()
-        sock = init()
+        sock = MockSock:new()
         str = "PING :server"
         expected = "PONG server\n"
-        result = handle(str, sock)
+        result = protocol.handle(str, sock)
         assert(1 == #sock.sent)
         assert(expected == sock.sent[1])
     end,
 
     test_hello = function()
-        sock = init()
+        sock = MockSock:new()
         str = ":xterm!omar@aboumrad.info PRIVMSG #betterhangout :hello"
         expected = "PRIVMSG #betterhangout :xterm: hi there :-)\n"
-        result = handle(str, sock)
+        result = protocol.handle(str, sock)
         assert(1 == #sock.sent)
         assert(expected == sock.sent[1])
     end,
 
     test_eval = function()
-        sock = init()
+        sock = MockSock:new()
         str = ":xterm!omar@aboumrad.info PRIVMSG #betterhangout := 1+1"
         expected = "PRIVMSG #betterhangout :xterm: 2\n"
-        result = handle(str, sock)
+        result = protocol.handle(str, sock)
         assert(1 == #sock.sent)
         assert(expected == sock.sent[1])
+    end,
+
+    test_failing_eval = function()
+        sock = MockSock:new()
+        str = ":xterm!omar@aboumrad.info PRIVMSG #betterhangout := 10lklkj"
+        expected = "PRIVMSG #betterhangout :xterm: Error!"
+        result = protocol.handle(str, sock)
+        assert(1 == #sock.sent)
+        assert(startswith(sock.sent[1], expected))
     end,
 }
 

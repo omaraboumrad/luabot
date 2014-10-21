@@ -1,24 +1,27 @@
-utils = require('utils')
+local utils = require('utils')
 
-map = {
+local M = {}
+
+local map = {
     ["^PING :(.+)"] = function(match, sock)
-        target = table.unpack(match)
+        local target = table.unpack(match)
         sock:send(("PONG %s\n"):format(target))
     end,
 
-    [(msg("hello"))] = function(match, sock)
-        nick, user, host, target = table.unpack(match)
+    [(utils.msg("hello"))] = function(match, sock)  -- note the change
+        local nick, user, host, target = table.unpack(match)
         sock:send(("PRIVMSG %s :%s: hi there :-)\n"):format(target, nick))
     end,
 
-    [(msg("= (.+)"))] = function(match, sock)
-        nick, user, host, target, code = table.unpack(match)
-        local result = loadstring("return " .. code)()
+    [(utils.msg("= (.+)"))] = function(match, sock)
+        local nick, user, host, target, code = table.unpack(match)
+        local status, res = pcall(loadstring("return " .. code))
+        local result = status and res or "Error! (" .. res .. ")"
         sock:send(("PRIVMSG %s :%s: %s\n"):format(target, nick, result))
     end
 }
 
-function handle(msg, sock)
+function M.handle(msg, sock)
     for pattern, handler in pairs(map) do
         local match = {msg:match(pattern)}
         if #match > 0 then
@@ -27,3 +30,5 @@ function handle(msg, sock)
         end
     end
 end
+
+return M
