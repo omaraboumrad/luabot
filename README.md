@@ -1,0 +1,3 @@
+# Dependencies
+
+    $ luarocks install luasocket
